@@ -1,0 +1,43 @@
+#!/bin/bash
+
+pattern_for_input='tests(.*)\.in$'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NONE='\033[0m'
+incorrect_outputs=()
+
+for file in $PWD/tests/* ; do
+  [[ $file =~ $pattern_for_input ]]
+  file_ending=${BASH_REMATCH[1]}
+  echo "$file_ending"
+
+  if [ "$file_ending" != "" ]; then
+    chmod 777 $PWD/tests${file_ending}.out
+    actual_output=$(swipl lab5.pl < $PWD/tests${file_ending}.in)
+    clear
+    desired_output=$(head -1 $PWD/tests${file_ending}.out)
+    clear
+
+    echo $actual_output
+    clear
+    echo $desired_output
+    clear
+
+    if [[ "$actual_output" == "$desired_output" ]]; then
+      echo "correct"
+      clear
+    else
+      echo -e "${RED}INCORRECT${NONE}"
+      incorrect_outputs+="${file_ending}\n"
+      incorrect_outputs+="${GREEN}$actual_output${NONE}\n"
+      incorrect_outputs+="${RED}$desired_output${NONE}\n\n"
+      clear
+    fi
+  fi
+done
+
+clear
+for incorrect_output in "${incorrect_outputs}"
+do
+  printf "$incorrect_output"
+done
